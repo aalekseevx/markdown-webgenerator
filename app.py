@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, send_file
 from os.path import join
 from datetime import datetime
 from subprocess import run
@@ -24,6 +24,7 @@ def write_pdf(file):
     file.save('./current.md')
     path = join(library_folder, datetime.now().strftime("%Y-%m-%d-%H:%M:%S")) + '.pdf'
     run([path_to_chrome, "--headless", "--no-sandbox", "-print-to-pdf=" + path, "current.html"])
+    return path
 
 
 @app.route('/', methods=['GET'])
@@ -35,8 +36,8 @@ def index_get():
 def index_post():
     if 'file' not in request.files:
         return 'No file, no money.'
-    write_pdf(request.files['file'])
-    return "All done, sir."
+    path = write_pdf(request.files['file'])
+    return send_file(path, mimetype='application/pdf')
 
 
 if __name__ == '__main__':
