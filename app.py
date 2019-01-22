@@ -3,28 +3,36 @@ from os.path import join
 from datetime import datetime
 from subprocess import run
 from bs4 import BeautifulSoup
-from settings import library_folder, path_to_chrome
+from settings import library_folder, path_to_chrome, temporary_files
+from os import remove
+
 app = Flask(__name__)
 
 
 def write_html(file):
-    file.save('./current.md')
-    run(["grip", "current.md", "--export", "raw.html"])
-    with open("raw.html") as f:
+    file.save('tmp/current.md')
+    run(["grip", "tmp/current.md", "--export", "tmp/raw.html"])
+    with open("tmp/raw.html") as f:
         raw_doc = f.read()
 
     soup = BeautifulSoup(raw_doc)
     article = str(soup.body.find('article'))
     with open("static/pref.txt") as pf:
         with open("static/suff.txt") as sf:
-            with open("current.html", "w") as hf:
+            with open("tmp/current.html", "w") as hf:
                 hf.write(pf.read() + article + sf.read())
+
+
+def clear_garbage():
+    for file in temporary_files:
+        remove(join('.', file))
 
 
 def write_pdf(file):
     write_html(file)
     path = join(library_folder, datetime.now().strftime("%Y-%m-%d-%H:%M:%S")) + '.pdf'
-    run([path_to_chrome, "--headless", "--no-sandbox", "-print-to-pdf=" + path, "current.html"])
+    run([path_to_chrome, "--headless", "--no-sandbox", "-print-to-pdf=" + path, "tmp/current.html"])
+    clear_garbage()
     return path
 
 
