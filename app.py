@@ -7,21 +7,22 @@ from settings import library_folder, path_to_chrome
 app = Flask(__name__)
 
 
-def get_html():
-    run(["grip", "current.md", "--export", "current.html"])
-    with open("current.html") as f:
+def write_html(file):
+    file.save('./current.md')
+    run(["grip", "current.md", "--export", "raw.html"])
+    with open("raw.html") as f:
         raw_doc = f.read()
 
     soup = BeautifulSoup(raw_doc)
     article = str(soup.body.find('article'))
     with open("static/pref.txt") as pf:
         with open("static/suff.txt") as sf:
-            resp = pf.read() + article + sf.read()
-            return resp
+            with open("current.html", "w") as hf:
+                hf.write(pf.read() + article + sf.read())
 
 
 def write_pdf(file):
-    file.save('./current.md')
+    write_html(file)
     path = join(library_folder, datetime.now().strftime("%Y-%m-%d-%H:%M:%S")) + '.pdf'
     run([path_to_chrome, "--headless", "--no-sandbox", "-print-to-pdf=" + path, "current.html"])
     return path
