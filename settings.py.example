@@ -1,2 +1,3 @@
-library_folder = '/Users/aleksandralekseev/Documents/GitHub/markdown/library'
+# use relative path
+library_folder = "./library"
 path_to_chrome = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
