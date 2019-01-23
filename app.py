@@ -31,6 +31,8 @@ def clear_garbage():
 def write_pdf(file):
     if not exists("tmp"):
         makedirs("tmp")
+    if not exists("library"):
+        makedirs("library")
     write_html(file)
     path = join(library_folder, datetime.now().strftime("%Y-%m-%d-%H:%M:%S")) + '.pdf'
     run([path_to_chrome, "--headless", "--no-sandbox", "-print-to-pdf=" + path, "tmp/current.html"])
