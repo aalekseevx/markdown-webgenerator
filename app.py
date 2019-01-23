@@ -3,7 +3,7 @@ from os.path import join, exists
 from datetime import datetime
 from subprocess import run
 from bs4 import BeautifulSoup
-from settings import library_folder, path_to_chrome, temporary_files
+from settings import *
 from os import remove, makedirs
 
 app = Flask(__name__)
@@ -29,10 +29,12 @@ def clear_garbage():
 
 
 def write_pdf(file):
-    if not exists("tmp"):
-        makedirs("tmp")
-    if not exists("library"):
-        makedirs("library")
+    if not exists(library_folder):
+        makedirs(library_folder)
+
+    if not exists(tmp_folder):
+        makedirs(tmp_folder)
+
     write_html(file)
     path = join(library_folder, datetime.now().strftime("%Y-%m-%d-%H:%M:%S")) + '.pdf'
     run([path_to_chrome, "--headless", "--no-sandbox", "-print-to-pdf=" + path, "tmp/current.html"])
